@@ -51,6 +51,8 @@ int main(void)
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
+	enviar_mensaje(valor, conexion);
+
 	// Armamos y enviamos el paquete
 	paquete(conexion);
 
@@ -108,13 +110,24 @@ void leer_consola(t_log* logger)
 void paquete(int conexion)
 {
 	// Ahora toca lo divertido!
-	char* leido;
-	t_paquete* paquete;
+	char* leido = readline("> ");
+	t_paquete* paquete = crear_paquete();
 
 	// Leemos y esta vez agregamos las lineas al paquete
 
+	 while (strlen(leido) > 0) {
+        agregar_a_paquete(paquete, leido, strlen(leido) + 1); 
+
+        free(leido);
+
+        leido = readline("> ");
+    }
+
+	enviar_paquete(paquete, conexion);
 
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+
+	 eliminar_paquete(paquete);
 	
 }
 
@@ -126,6 +139,10 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 
 	if(config != NULL){
 		config_destroy(config);
+	}
+
+	if(conexion != NULL){
+		liberar_conexion(conexion);
 	}
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
